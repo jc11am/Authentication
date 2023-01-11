@@ -1,5 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import Password from "./components/Password";
 import Username from "./components/Username";
+import Recovery from "./components/Recovery";
+import Reset from "./components/Reset";
+import Register from "./components/Register";
 
 const router = createBrowserRouter([
   {
@@ -8,15 +12,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/reset",
-    element: <Username></Username>
+    element: <Reset></Reset>
   },
   {
     path: "/register",
-    element: <Username></Username>
+    element: <Register></Register>
   },
   {
     path: "/recovery",
-    element: <Username></Username>
+    element: <Recovery></Recovery>
   },
   {
     path: "/profile",
@@ -24,7 +28,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/password",
-    element: <Username></Username>
+    element: <Password></Password>
   },
   {
     path: "*",
