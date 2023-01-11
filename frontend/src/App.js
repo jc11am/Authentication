@@ -4,6 +4,7 @@ import Username from "./components/Username";
 import Recovery from "./components/Recovery";
 import Reset from "./components/Reset";
 import Register from "./components/Register";
+import Profile from "./components/Profile";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile",
-    element: <Username></Username>
+    element: <Profile></Profile>
   },
   {
     path: "/password",

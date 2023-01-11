@@ -8,8 +8,6 @@ export async function validatedError (values){
     return error
 }
 
-
-
 //Password validate function
 export async function passwordValidated(values){
     const errors = passwordValidate({}, values)
@@ -34,6 +32,13 @@ export async function registerValidation(values){
     emailVerify(errors, values);
 
     return errors;
+}
+
+//export profile validate
+export async function profileVerify(values){
+    const errors = emailVerify({}, values)
+
+    return errors
 }
 
 //Username input validate
