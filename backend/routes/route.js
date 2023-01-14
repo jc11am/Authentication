@@ -1,38 +1,34 @@
 const express = require("express")
 const router = express.Router()
+const { login,
+    resetPassword,
+    updateUser,
+    createResetSession,
+    verifyOTP,
+    generateOTP,
+    getUser,
+    register } = require("../controllers/controllers")
 
 
 //Get Method
-router.get("/user/:username", function(req,res){
-    res.status(200).json("hello")
-})
-router.get("/generateotp", function(req,res){
-    res.status(200).json("hello")
-})
-router.get("/verifyotp", function(req,res){
-    res.status(200).json("hello")
-})
-router.get("/createresetsession", function(req,res){
-    res.status(200).json("hello")
-})
+router.get("/user/:username", getUser)
+router.get("/generateotp", generateOTP)
+router.get("/verifyotp", verifyOTP)
+router.get("/createresetsession", createResetSession)
 
 //Post Method
-router.post("/register", function(req, res){
-    res.json({message: "Posted"})
-});
+router.post("/register", register);
 router.post("/registermail", function(req, res){
     res.json({message: "Posted"})
 });
 router.post("/authenticate", function(req, res){
     res.json({message: "Posted"})
 }) 
-router.post("/login", function(req, res){
-    res.json({message: "Posted"})
-}) 
+router.post("/login", login) 
 
 //Put Method
-router.put("/updateuser")
-router.put("/resetpassword")
+router.put("/updateuser", updateUser)
+router.put("/resetpassword", resetPassword)
 
 
 module.exports = router
