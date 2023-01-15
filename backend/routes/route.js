@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+const userAuth = require("../middleware/userAuth")
 const { login,
     resetPassword,
     updateUser,
@@ -24,7 +25,7 @@ router.post("/registermail", function(req, res){
 router.post("/authenticate", function(req, res){
     res.json({message: "Posted"})
 }) 
-router.post("/login", login) 
+router.post("/login", userAuth, login) 
 
 //Put Method
 router.put("/updateuser", updateUser)

@@ -24,6 +24,7 @@ const bcrypt = require("bcrypt")
     profile: { type: String}
 });
 
+//Register
 UserSchema.statics.register = async function(email, password, username, profile) {
 
     if(!email || !username || !password){
@@ -51,6 +52,26 @@ UserSchema.statics.register = async function(email, password, username, profile)
 
     return newUser
 
+}
+
+//Login
+UserSchema.statics.login = async function(username, password){
+    //validation
+    if(!username || !password){
+        throw Error("All fields are required")
+    }
+    const checkUsername = await this.findOne({username})
+
+    if(!checkUsername){
+        throw Error("User does not exist")
+    }
+    const compare = bcrypt.compare( password, checkUsername.password )
+
+    if(!compare){
+        throw Error("Wrong Password")
+    }
+
+    return checkUsername
 }
 
 const People = mongoose.model("People", UserSchema);
