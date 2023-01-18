@@ -1,5 +1,7 @@
 const People = require("../model/model")
 const jwt = require("jsonwebtoken")
+const otpGenerator = require("otp-generator")
+const bcrypt = require("bcrypt")
 
 const token = function(_id, username){
     return jwt.sign({_id, username}, process.env.Secret, { expiresIn: "3d" })
@@ -38,11 +40,11 @@ const login = async function(req, res){
 
 //get
 const getUser = async function(req, res){
-    const { username } = req.params
+    const { username } = req.params;
 
     try {
         if(!username){
-            return  res.status(400).json({message: "Invalid Username"})
+            return  res.status(400).json({message: "Invalid User"})
         }
         const user = await People.findOne({username})
         if(!user){
@@ -58,27 +60,41 @@ const getUser = async function(req, res){
 }
 
 const generateOTP = async function(req, res){
-    
+    req.app.locals.OTP = await otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false})
+    res.status(200).json({ code: req.app.locals.OTP })
 }
 
 const verifyOTP = async function(req, res){
+    const { code } = req.query;
+    //Check if code match
+    if(parseInt( req.app.locals.OTP) === parseInt(code)){
+        req.app.locals.OTP = null; //Rest OTP
+        req.app.locals.resetSession = true; //Start session for reset password
+        return res.status(200).json({message: "Verify Successfully"})
+    }
+    return res.status(400).json({error: "Invalid OTP"})
     
 }
 
 const createResetSession = async function(req, res){
-    
+    if(req.app.locals.resetSession){
+        req.app.locals.resetSession = false;
+        return res.status(200).json({message: "access granted"})
+    }
+    return res.status(400).json({ error: "Session expired" })    
 }
+
 //Put
 const updateUser = async function(req, res){
-    const id = req.query.id
+    const {_id}  = req.user;
 
     try {
-        if(!id){
+        if(!_id){
           return  res.status(400).json({message: "Not Authorized"})
         }
         const body =req.body;
-        const newBody = await People.updateOne({ _id: id }, body)
-        res.status(200).json({message: "User Updated"})
+        const userUpdate = await People.updateOne({ _id }, body)
+        res.status(200).json({userUpdate})
 
     } catch (error) {
         res.status(400).json({error: error.message}) 
@@ -86,7 +102,42 @@ const updateUser = async function(req, res){
 }
 
 const resetPassword = async function(req, res){
-    
+    try {
+        
+        if(!req.app.locals.resetSession){
+            return res.status(400).json({ error: "Session expired" })
+        }
+        const { username, password } = req.body;
+        try {
+            
+            People.findOne({ username})
+                .then(user => {
+                    bcrypt.hash(password, 10)
+                        .then(hashedPassword => {
+                            People.updateOne({ username : user.username },
+                            { password: hashedPassword}, function(err, data){
+                                if(err) throw err;
+                                req.app.locals.resetSession = false;
+                                return res.status(201).send({ msg : "Record Updated...!"})
+                            });
+                        })
+                        .catch( e => {
+                            return res.status(500).json({
+                                error : "Enable to hashed password"
+                            })
+                        })
+                })
+                .catch(error => {
+                    return res.status(404).json({error: error.message })
+                })
+
+        } catch (error) {
+            return res.status(500).json({error: error.message })
+        }
+
+    } catch (error) {
+        return res.status(401).json({error: error.message })
+    }
 }
 
 module.exports = {
